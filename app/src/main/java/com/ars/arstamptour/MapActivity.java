@@ -235,14 +235,21 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
+    //지도상의 목적지 클릭 했을때 이벤트
     @Override
     public boolean onMarkerClick(Marker marker){
         int distance = (int) LocationDistance.distance(marker.getPosition().latitude,marker.getPosition().longitude,currentPosition.latitude,currentPosition.longitude);
 
         Toast.makeText(this,"현재 목표까지 거리: "+distance+"M\n" +
                 "50M안까지 접근하세요!",Toast.LENGTH_LONG).show();
+
         Intent intent = new Intent(this, LocationActivity.class);
+
+        intent.putExtra("Latitude",marker.getPosition().latitude);
+        intent.putExtra("Longitude",marker.getPosition().longitude);
+
         startActivity(intent);
+        finish();
 
 
         return  true;

@@ -61,6 +61,7 @@ public class HelloSceneformActivity extends AppCompatActivity {
     setContentView(R.layout.activity_ux);
     arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
+
     // When you build a Renderable, Sceneform loads its resources in the background while returning
     // a CompletableFuture. Call thenAccept(), handle(), or check isDone() before calling get().
     ModelRenderable.builder()
@@ -76,7 +77,8 @@ public class HelloSceneformActivity extends AppCompatActivity {
               return null;
             });
 
-    arFragment.setOnTapArPlaneListener(
+
+    arFragment.setOnTapArPlaneListener( // 바닥 눌렀을때 액션
         (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
           if (andyRenderable == null) {
             return;

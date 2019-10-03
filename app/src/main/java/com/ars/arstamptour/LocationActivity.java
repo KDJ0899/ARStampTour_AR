@@ -24,10 +24,8 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,7 +34,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.ar.core.Frame;
-import com.google.ar.core.Plane;
 import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
@@ -51,8 +48,6 @@ import java.util.concurrent.ExecutionException;
 
 import uk.co.appoly.arcorelocation.LocationMarker;
 import uk.co.appoly.arcorelocation.LocationScene;
-import uk.co.appoly.arcorelocation.rendering.LocationNode;
-import uk.co.appoly.arcorelocation.rendering.LocationNodeRender;
 import uk.co.appoly.arcorelocation.sensor.DeviceLocation;
 import uk.co.appoly.arcorelocation.utils.ARLocationPermissionHelper;
 
@@ -78,6 +73,11 @@ public class LocationActivity extends AppCompatActivity {
 
     private Context context;
 
+    private double latitude;
+    private double longitude;
+
+    private Intent intent;
+
 
     @Override
     @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
@@ -88,6 +88,10 @@ public class LocationActivity extends AppCompatActivity {
         arSceneView = findViewById(R.id.ar_scene_view);
 
         context = getApplicationContext();
+
+        intent = getIntent();
+        latitude = intent.getExtras().getDouble("Latitude");
+        longitude = intent.getExtras().getDouble("Longitude");
 
         //  나중에 카메라 접근하기 전에 확인할 것.
         if ( Build.VERSION.SDK_INT >= 23 &&
@@ -211,8 +215,8 @@ public class LocationActivity extends AppCompatActivity {
                                 // Adding a simple location marker of a 3D model
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
-                                                126.722939,
-                                                37.545648,
+                                                longitude,
+                                                latitude,
                                                 getAndy()));
                             }
 
@@ -274,9 +278,8 @@ public class LocationActivity extends AppCompatActivity {
         base.setRenderable(andyRenderable);
         Context c = this;
         base.setOnTapListener((v, event) -> {
-            Toast.makeText(
-                    c, "Andy touched.", Toast.LENGTH_LONG)
-                    .show();
+            Intent intent = new Intent(this, SearchToCameraPopupActivity.class);
+            startActivityForResult(intent,1);
         });
         return base;
     }
@@ -421,6 +424,31 @@ public class LocationActivity extends AppCompatActivity {
                 });
 
         alertDialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+        Intent intent;
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                //데이터 받기
+                String result = data.getStringExtra("result");
+
+                if (result.equals("Yes")){
+                    intent = new Intent(this,HelloSceneformActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                else{
+                    Toast.makeText(this,"No",Toast.LENGTH_LONG).show();
+                    intent = new Intent(this,HelloSceneformActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+            }
+        }
     }
 
 }
