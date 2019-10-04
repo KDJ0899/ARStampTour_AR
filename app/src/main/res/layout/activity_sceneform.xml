@@ -1,5 +1,5 @@
 <!--
-   Copyright 2017 Google Inc.
+   Copyright 2018 Google LLC.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,17 +13,45 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LocationActivity">
+    tools:context=".SceneformActivity">
 
-  <com.google.ar.sceneform.ArSceneView
-      android:id="@+id/ar_scene_view"
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:layout_gravity="top"/>
+  <fragment
+      class="com.google.ar.sceneform.ux.ArFragment"
+      android:id="@+id/ux_fragment"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
 
-</RelativeLayout>
+  <Button
+      android:id="@+id/btnBack"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Back"
+      android:layout_marginBottom="20dp"/>
+  </LinearLayout>
+
+  <LinearLayout
+      android:orientation="horizontal"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="bottom|center_horizontal">
+
+  <Button
+      android:id="@+id/btnCapture"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="capture"
+      android:layout_marginBottom="60dp"
+      android:visibility="visible"
+      android:onClick="mCapture"/>
+  </LinearLayout>
+
+
+</FrameLayout>

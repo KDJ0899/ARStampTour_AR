@@ -169,6 +169,7 @@ public class MapActivity extends AppCompatActivity
 
         LatLng location1 = new LatLng(37.487503, 126.825758);
         LatLng location2 = new LatLng(37.542091, 126.716889);
+        LatLng location3 = new LatLng(37.545764, 126.723152);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(location1);
@@ -179,6 +180,10 @@ public class MapActivity extends AppCompatActivity
         markerOptions.position(location2);
         markerOptions.title("북인천 중");
         markerOptions.snippet("북인천 중");
+        googleMap.addMarker(markerOptions);
+
+        markerOptions.position(location3);
+        markerOptions.title("이디야 카페 앞");
         googleMap.addMarker(markerOptions);
 
 
@@ -243,7 +248,7 @@ public class MapActivity extends AppCompatActivity
         Toast.makeText(this,"현재 목표까지 거리: "+distance+"M\n" +
                 "50M안까지 접근하세요!",Toast.LENGTH_LONG).show();
 
-        Intent intent = new Intent(this, LocationActivity.class);
+        Intent intent = new Intent(this, SceneformActivity.class);
 
         intent.putExtra("Latitude",marker.getPosition().latitude);
         intent.putExtra("Longitude",marker.getPosition().longitude);

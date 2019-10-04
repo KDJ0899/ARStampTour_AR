@@ -55,7 +55,7 @@ import uk.co.appoly.arcorelocation.utils.ARLocationPermissionHelper;
  * This is a simple example that shows how to create an augmented reality (AR) application using the
  * ARCore and Sceneform APIs.
  */
-public class LocationActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity {
     private boolean installRequested;
     private boolean hasFinishedLoading = false;
     
@@ -84,7 +84,7 @@ public class LocationActivity extends AppCompatActivity {
     // CompletableFuture requires api level 24
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sceneform);
+        setContentView(R.layout.activity_search);
         arSceneView = findViewById(R.id.ar_scene_view);
 
         context = getApplicationContext();
@@ -212,7 +212,7 @@ public class LocationActivity extends AppCompatActivity {
 //                                // Adding the marker
 //                                locationScene.mLocationMarkers.add(layoutLocationMarker);
 
-                                // Adding a simple location marker of a 3D model
+                                // 앤디 객체 생성
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
                                                 longitude,
@@ -385,7 +385,7 @@ public class LocationActivity extends AppCompatActivity {
 
         loadingMessageSnackbar =
                 Snackbar.make(
-                        LocationActivity.this.findViewById(android.R.id.content),
+                        SearchActivity.this.findViewById(android.R.id.content),
                         "앤디를 찾으세요!",
                         Snackbar.LENGTH_INDEFINITE);
         loadingMessageSnackbar.getView().setBackgroundColor(0xbf323232);
@@ -436,13 +436,13 @@ public class LocationActivity extends AppCompatActivity {
                 String result = data.getStringExtra("result");
 
                 if (result.equals("Yes")){
-                    intent = new Intent(this,HelloSceneformActivity.class);
+                    intent = new Intent(this, SceneformActivity.class);
                     startActivity(intent);
                     finish();
                 }
                 else{
                     Toast.makeText(this,"No",Toast.LENGTH_LONG).show();
-                    intent = new Intent(this,HelloSceneformActivity.class);
+                    intent = new Intent(this, SceneformActivity.class);
                     startActivity(intent);
                     finish();
                 }
