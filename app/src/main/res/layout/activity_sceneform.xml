@@ -24,17 +24,21 @@
       android:id="@+id/ux_fragment"
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
+
   <LinearLayout
       android:orientation="horizontal"
       android:layout_width="match_parent"
       android:layout_height="match_parent">
 
-  <Button
+  <ImageButton
       android:id="@+id/btnBack"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Back"
-      android:layout_marginBottom="20dp"/>
+      android:layout_marginStart="10dp"
+      android:layout_marginTop="10dp"
+      android:background="#00000000"
+      android:src="@drawable/previous"
+      />
   </LinearLayout>
 
   <LinearLayout
@@ -43,15 +47,14 @@
       android:layout_height="match_parent"
       android:gravity="bottom|center_horizontal">
 
-  <Button
-      android:id="@+id/btnCapture"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="capture"
-      android:layout_marginBottom="60dp"
-      android:visibility="visible"
-      android:onClick="mCapture"/>
+    <ImageButton
+        android:id="@+id/btnCapture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:visibility="invisible"
+        android:background="@drawable/roundbutton"
+        android:src="@drawable/camera"
+        />
   </LinearLayout>
-
-
 </FrameLayout>

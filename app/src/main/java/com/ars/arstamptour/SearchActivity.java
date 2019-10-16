@@ -90,8 +90,7 @@ public class SearchActivity extends AppCompatActivity {
         context = getApplicationContext();
 
         intent = getIntent();
-        latitude = intent.getExtras().getDouble("Latitude");
-        longitude = intent.getExtras().getDouble("Longitude");
+
 
         //  나중에 카메라 접근하기 전에 확인할 것.
         if ( Build.VERSION.SDK_INT >= 23 &&
@@ -169,49 +168,6 @@ public class SearchActivity extends AppCompatActivity {
 
                                 deviceLocation = new DeviceLocation(locationScene);
 
-
-                                // Now lets create our location markers.
-                                // First, a layout
-//                                LocationMarker layoutLocationMarker = new LocationMarker(
-//                                        126.722939,
-//                                        37.545648,
-//                                        getExampleView()
-//                                );
-//
-//                                // An example "onRender" event, called every frame
-//                                // Updates the layout with the markers distance
-//                                layoutLocationMarker.setRenderEvent(new LocationNodeRender() {
-//                                    @Override
-//                                    public void render(LocationNode node) {
-//
-//                                        View eView = exampleLayoutRenderable.getView();
-//                                        TextView distanceTextView = eView.findViewById(R.id.textView2);
-//
-//                                        distanceTextView.setText(node.getDistance()+"M");
-//                                    }
-//                                });
-//                                // Adding the marker
-//                                locationScene.mLocationMarkers.add(layoutLocationMarker);LocationMarker layoutLocationMarker = new LocationMarker(
-//                                        126.722939,
-//                                        37.545648,
-//                                        getExampleView()
-//                                );
-//
-//                                // An example "onRender" event, called every frame
-//                                // Updates the layout with the markers distance
-//                                layoutLocationMarker.setRenderEvent(new LocationNodeRender() {
-//                                    @Override
-//                                    public void render(LocationNode node) {
-//
-//                                        View eView = exampleLayoutRenderable.getView();
-//                                        TextView distanceTextView = eView.findViewById(R.id.textView2);
-//
-//                                        distanceTextView.setText(node.getDistance()+"M");
-//                                    }
-//                                });
-//                                // Adding the marker
-//                                locationScene.mLocationMarkers.add(layoutLocationMarker);
-
                                 // 앤디 객체 생성
                                 locationScene.mLocationMarkers.add(
                                         new LocationMarker(
@@ -245,27 +201,6 @@ public class SearchActivity extends AppCompatActivity {
 
         // Lastly request CAMERA & fine location permission which is required by ARCore-Location.
         ARLocationPermissionHelper.requestPermission(this);
-    }
-
-    /**
-     * Example node of a layout
-     *
-     * @return
-     */
-    private Node getExampleView() {
-        Node base = new Node();
-        base.setRenderable(exampleLayoutRenderable);
-        Context c = this;
-        // Add  listeners etc here
-        View eView = exampleLayoutRenderable.getView();
-        eView.setOnTouchListener((v, event) -> {
-            Toast.makeText(
-                    c, "Location marker touched.", Toast.LENGTH_LONG)
-                    .show();
-            return false;
-        });
-
-        return base;
     }
 
     /***
@@ -430,6 +365,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
         Intent intent;
+
         if(requestCode==1){
             if(resultCode==RESULT_OK){
                 //데이터 받기

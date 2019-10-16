@@ -39,6 +39,7 @@ dependencies {
 
     // Alternatively, use ArSceneView without the UX dependency.
     implementation "com.google.ar.sceneform:core:1.12.0"
+    implementation "com.google.ar.sceneform:animation:1.12.0"
     implementation 'com.google.android.gms:play-services-maps:16.0.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.google.android.material:material:1.0.0'
@@ -55,3 +56,34 @@ sceneform.asset('sampledata/models/andy.obj',
         'default',
         'sampledata/models/andy.sfa',
         'src/main/res/raw/andy')
+
+
+sceneform.asset('sampledata/models/avocado.obj',
+        'default',
+        'sampledata/models/avocado.sfa',
+        'src/main/res/raw/avocado')
+
+sceneform.asset('sampledata/models/kirby.obj',
+        'default',
+        'sampledata/models/kirby.sfa',
+        'src/main/res/raw/kirby')
+
+sceneform.asset('sampledata/models/rabbit.obj',
+        'default',
+        'sampledata/models/rabbit.sfa',
+        'src/main/res/raw/rabbit')
+
+sceneform.asset('sampledata/models/koala.obj',
+        'default',
+        'sampledata/models/koala.sfa',
+        'src/main/res/raw/koala')
+
+sceneform.asset('sampledata/models/jerry.obj',
+        'default',
+        'sampledata/models/jerry.sfa',
+        'src/main/res/raw/jerry')
+
+sceneform.asset('sampledata/models/sorbe.obj',
+        'default',
+        'sampledata/models/sorbe.sfa',
+        'src/main/res/raw/sorbe')

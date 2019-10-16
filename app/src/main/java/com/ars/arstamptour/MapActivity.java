@@ -33,11 +33,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -66,7 +68,9 @@ public class MapActivity extends AppCompatActivity
     Location mCurrentLocatiion;
     boolean mMoveMapByUser = true;
     boolean mMoveMapByAPI = true;
-    LatLng currentPosition;
+    static LatLng currentPosition;
+
+    LocationList locList;
 
     LocationRequest locationRequest = new LocationRequest()
             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -167,9 +171,13 @@ public class MapActivity extends AppCompatActivity
         mGoogleMap = googleMap;
         googleMap.setOnMarkerClickListener(this);
 
+        List<LatLng> list = new ArrayList<>();
+
         LatLng location1 = new LatLng(37.487503, 126.825758);
         LatLng location2 = new LatLng(37.542091, 126.716889);
         LatLng location3 = new LatLng(37.545764, 126.723152);
+
+        list.add(location2);
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(location1);
@@ -185,6 +193,8 @@ public class MapActivity extends AppCompatActivity
         markerOptions.position(location3);
         markerOptions.title("이디야 카페 앞");
         googleMap.addMarker(markerOptions);
+
+
 
 
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
@@ -244,17 +254,20 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker){
         int distance = (int) LocationDistance.distance(marker.getPosition().latitude,marker.getPosition().longitude,currentPosition.latitude,currentPosition.longitude);
+        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+        if(distance>=100){
+            Toast.makeText(this,"현재 목표까지 거리: "+distance+"M\n" +
+                    "50M안까지 접근하세요!",Toast.LENGTH_LONG).show();
+        }
+        else {
+            Intent intent = new Intent(this, SearchActivity.class);
 
-        Toast.makeText(this,"현재 목표까지 거리: "+distance+"M\n" +
-                "50M안까지 접근하세요!",Toast.LENGTH_LONG).show();
+            intent.putExtra("Latitude", marker.getPosition().latitude);
+            intent.putExtra("Longitude", marker.getPosition().longitude);
 
-        Intent intent = new Intent(this, SceneformActivity.class);
-
-        intent.putExtra("Latitude",marker.getPosition().latitude);
-        intent.putExtra("Longitude",marker.getPosition().longitude);
-
-        startActivity(intent);
-        finish();
+            startActivity(intent);
+            finish();
+        }
 
 
         return  true;

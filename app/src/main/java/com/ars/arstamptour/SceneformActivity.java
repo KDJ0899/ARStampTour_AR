@@ -27,11 +27,14 @@ import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.PixelCopy;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,12 +46,16 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * This is an example activity that uses the Sceneform UX package to make common AR tasks easier.
@@ -62,11 +69,13 @@ public class SceneformActivity extends AppCompatActivity {
 
   private boolean first=true;
 
-  private Button Capture,Back;
+  private ImageButton Capture,Back;
   private AppCompatActivity mActivity;
 
   int writePermission;
   private Snackbar loadingMessageSnackbar = null;
+
+  private File fileAddress=new File(Environment.getExternalStorageDirectory() + "/DCIM/ARStampTour");
 
   @Override
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
@@ -75,10 +84,9 @@ public class SceneformActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    Capture = (Button) findViewById(R.id.btnCapture);
-    Back = (Button) findViewById(R.id.btnBack);
+    Capture = findViewById(R.id.btnCapture);
 
-    mActivity = this;
+
 
       grantExternalStoragePermission();
 
@@ -91,8 +99,9 @@ public class SceneformActivity extends AppCompatActivity {
 
     // When you build a Renderable, Sceneform loads its resources in the background while returning
     // a CompletableFuture. Call thenAccept(), handle(), or check isDone() before calling get().
+
     ModelRenderable.builder()
-        .setSource(this, R.raw.andy)
+        .setSource(this, R.raw.sorbe)
         .build()
         .thenAccept(renderable -> andyRenderable = renderable)
         .exceptionally(
@@ -117,16 +126,16 @@ public class SceneformActivity extends AppCompatActivity {
           first=false;
 
           //로딩 메세지 없애기
-          if(loadingMessageSnackbar==null)
-              return;
+          if(loadingMessageSnackbar!=null) {
+              loadingMessageSnackbar.dismiss();
+              loadingMessageSnackbar = null;
+          }
 
-          loadingMessageSnackbar.dismiss();
-          loadingMessageSnackbar = null;
-
-          Capture = (Button) findViewById(R.id.btnCapture);
-
-
+          Capture = (ImageButton) findViewById(R.id.btnCapture);
           Capture.setVisibility(View.VISIBLE);
+
+
+          Capture.setOnClickListener(capture->{takePhoto();});
 
           // Create the Anchor.
           Anchor anchor = hitResult.createAnchor();
@@ -151,6 +160,12 @@ public class SceneformActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        first=true;
+    }
+
     /**
    * Returns false and displays an error message if Sceneform can not run, true if Sceneform can run
    * on this device.
@@ -159,6 +174,7 @@ public class SceneformActivity extends AppCompatActivity {
    *
    * <p>Finishes the activity if Sceneform can not run
    */
+
   public static boolean checkIsSupportedDeviceOrFinish(final Activity activity) {
     if (Build.VERSION.SDK_INT < VERSION_CODES.N) {
       Log.e(TAG, "Sceneform requires Android N or later");
@@ -225,37 +241,65 @@ public class SceneformActivity extends AppCompatActivity {
         }
     }
 
-
-
-    public void mCapture(View v){
-        View rootView = getWindow().getDecorView();
-
-        File screenShot = ScreenShot(rootView);
-        if(screenShot!=null){
-            //갤러리에 추가
-            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(screenShot)));
-        }
+    private String generateFilename() {
+        String date =
+                new SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(new Date());
+        return date + ".jpg";
     }
 
-    //화면 캡쳐하기
-    public File ScreenShot(View view) {
-        view.setDrawingCacheEnabled(true);  //화면에 뿌릴때 캐시를 사용하게 한다
+    private void saveBitmapToDisk(Bitmap bitmap, String filename) throws IOException {
 
-        Bitmap screenBitmap = view.getDrawingCache();   //캐시를 비트맵으로 변환
-
-        String filename = "System.currentTimeMillis().jpg";
-        File file = new File(Environment.getExternalStorageDirectory() + "/Pictures", filename);  //Pictures폴더 screenshot.png 파일
-        FileOutputStream os = null;
+        File out = new File(Environment.getExternalStorageDirectory() + "/DCIM/ARStampTour",filename);
+        if(!fileAddress.exists())
+            fileAddress.mkdir();
         try {
-            os = new FileOutputStream(file);
-            screenBitmap.compress(Bitmap.CompressFormat.JPEG, 90, os);   //비트맵을 PNG파일로 변환
-            os.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+            FileOutputStream outputStream = new FileOutputStream(out);
+            ByteArrayOutputStream outputData = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputData);
+            outputData.writeTo(outputStream);
+            outputStream.flush();
+            outputStream.close();
 
-        view.setDrawingCacheEnabled(false);
-        return file;
+        } catch (IOException ex) {
+            throw new IOException("Failed to save bitmap to disk", ex);
+        }
+         if(out!=null) {
+             //갤러리에 추가
+             sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(out)));
+         }
     }
+
+    private void takePhoto() {
+        final String filename = generateFilename();
+        ArSceneView view = arFragment.getArSceneView();
+
+        // Create a bitmap the size of the scene view.
+        final Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
+                Bitmap.Config.ARGB_8888);
+
+        // Create a handler thread to offload the processing of the image.
+        final HandlerThread handlerThread = new HandlerThread("PixelCopier");
+        handlerThread.start();
+        // Make the request to copy.
+        PixelCopy.request(view, bitmap, (copyResult) -> {
+            if (copyResult == PixelCopy.SUCCESS) {
+                try {
+                    saveBitmapToDisk(bitmap, filename);
+                    Toast.makeText(SceneformActivity.this,"저장 완료",Toast.LENGTH_LONG).show();
+                } catch (IOException e) {
+                    Toast toast = Toast.makeText(SceneformActivity.this, e.toString(),
+                            Toast.LENGTH_LONG);
+                    toast.show();
+                    return;
+                }
+            } else {
+                Toast toast = Toast.makeText(SceneformActivity.this,
+                        "Failed to copyPixels: " + copyResult, Toast.LENGTH_LONG);
+                toast.show();
+            }
+            handlerThread.quitSafely();
+
+        }, new Handler(handlerThread.getLooper()));
+    }
+
 }

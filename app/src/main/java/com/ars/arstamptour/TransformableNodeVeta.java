@@ -22,6 +22,7 @@ public class TransformableNodeVeta extends TransformableNode {
 
         scaleController = new ScaleController(this, transformationSystem.getPinchRecognizer());
         scaleController.setMaxScale(10.0f);// 모델 크기 변경
+        scaleController.setMinScale(0.1f);
         addTransformationController(scaleController);
 
         rotationController = new RotationController(this, transformationSystem.getTwistRecognizer());
