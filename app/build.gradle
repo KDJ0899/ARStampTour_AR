@@ -46,6 +46,7 @@ dependencies {
     implementation "com.android.support:design:28.1.1"
 //    implementation 'uk.co.appoly.arcorelocation:arcore-location-debug@aar'
     implementation 'com.github.appoly:ARCore-Location:1.0.5'
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
 
 
 }

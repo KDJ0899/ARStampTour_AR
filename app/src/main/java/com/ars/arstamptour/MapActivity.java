@@ -2,9 +2,13 @@ package com.ars.arstamptour;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -13,8 +17,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -65,10 +74,14 @@ public class MapActivity extends AppCompatActivity
     private AppCompatActivity mActivity;
     boolean askPermissionOnceAgain = false;
     boolean mRequestingLocationUpdates = false;
-    Location mCurrentLocatiion;
     boolean mMoveMapByUser = true;
     boolean mMoveMapByAPI = true;
+
     static LatLng currentPosition;
+    private List<Marker> markers = new ArrayList<Marker>();
+    View marker_root_view;
+    TextView tv_marker;
+
 
     LocationList locList;
 
@@ -84,8 +97,10 @@ public class MapActivity extends AppCompatActivity
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_map);
 
+        marker_root_view = LayoutInflater.from(this).inflate(R.layout.custom_marker, null);
+        tv_marker = (TextView) marker_root_view.findViewById(R.id.tv_marker);
 
         Log.d(TAG, "onCreate");
         mActivity = this;
@@ -171,9 +186,10 @@ public class MapActivity extends AppCompatActivity
         mGoogleMap = googleMap;
         googleMap.setOnMarkerClickListener(this);
 
+
         List<LatLng> list = new ArrayList<>();
 
-        LatLng location1 = new LatLng(37.487503, 126.825758);
+        LatLng location1 = new LatLng(37.487503, 126.716889);
         LatLng location2 = new LatLng(37.542091, 126.716889);
         LatLng location3 = new LatLng(37.545764, 126.723152);
 
@@ -181,21 +197,19 @@ public class MapActivity extends AppCompatActivity
 
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(location1);
-        markerOptions.title("승연관");
-        markerOptions.snippet("승연관");
-        googleMap.addMarker(markerOptions);
+        tv_marker.setText("북인천 중10");
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker_root_view)));
+        markers.add(googleMap.addMarker(markerOptions));
 
         markerOptions.position(location2);
-        markerOptions.title("북인천 중");
-        markerOptions.snippet("북인천 중");
-        googleMap.addMarker(markerOptions);
+        tv_marker.setText("북인천 중11");
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker_root_view)));
+        markers.add(googleMap.addMarker(markerOptions));
 
         markerOptions.position(location3);
-        markerOptions.title("이디야 카페 앞");
-        googleMap.addMarker(markerOptions);
-
-
-
+        tv_marker.setText("북인천 중12");
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(this, marker_root_view)));
+        markers.add(googleMap.addMarker(markerOptions));
 
         //런타임 퍼미션 요청 대화상자나 GPS 활성 요청 대화상자 보이기전에
         //지도의 초기위치를 서울로 이동
@@ -254,7 +268,6 @@ public class MapActivity extends AppCompatActivity
     @Override
     public boolean onMarkerClick(Marker marker){
         int distance = (int) LocationDistance.distance(marker.getPosition().latitude,marker.getPosition().longitude,currentPosition.latitude,currentPosition.longitude);
-        marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
         if(distance>=100){
             Toast.makeText(this,"현재 목표까지 거리: "+distance+"M\n" +
                     "50M안까지 접근하세요!",Toast.LENGTH_LONG).show();
@@ -541,7 +554,6 @@ public class MapActivity extends AppCompatActivity
         }
     }
 
-
     @TargetApi(Build.VERSION_CODES.M)
     private void showDialogForPermission(String msg) {
 
@@ -591,7 +603,6 @@ public class MapActivity extends AppCompatActivity
         builder.create().show();
     }
 
-
     //여기부터는 GPS 활성화를 위한 메소드들
     private void showDialogForLocationServiceSetting() {
 
@@ -617,7 +628,6 @@ public class MapActivity extends AppCompatActivity
         builder.create().show();
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -641,10 +651,23 @@ public class MapActivity extends AppCompatActivity
                         return;
                     }
                 }
-
                 break;
         }
     }
 
+    private Bitmap createDrawableFromView(Context context, View view) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.layout(0, 0, displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return bitmap;
+    }
 
 }
